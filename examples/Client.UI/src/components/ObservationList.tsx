@@ -21,7 +21,7 @@ import { ObservationCode } from "../utils/ObservationCode";
 const ObservationList: React.FC = () => {
   const navigate = useNavigate();
   const store = useStore();
-  
+
   const getObservationName = (code: string) => {
     return ObservationCode[code] ?? '';
   };
@@ -31,7 +31,7 @@ const ObservationList: React.FC = () => {
     return new Date(dateTimeStr).toLocaleString();
   }
 
-  const { updateObservations, state } = store 
+  const { updateObservations, state } = store
   const { data, loading } = state.observations;
 
   return (
@@ -39,7 +39,7 @@ const ObservationList: React.FC = () => {
       <Typography variant='h3'>Observations</Typography>
       <Divider sx={{mb: 2}}/>
       <Stack direction='row' sx={{mb: 2}}>
-        <Button color='primary' variant='contained'  disabled={loading} onClick={() => updateObservations()}>Update</Button>
+        <Button color='primary' variant='contained'  disabled={loading} onClick={() => updateObservations(100, 1)}>Poll</Button>
         <Button variant='outlined' sx={{ml: 'auto'}} onClick={() => navigate('/patients')}>Go to Patients</Button>
       </Stack>
 
@@ -63,7 +63,6 @@ const ObservationList: React.FC = () => {
                   {getObservationName(obs.code?.coding?.[0]?.code ?? '')}
                 </TableCell>
                 <TableCell align="center">{obs?.value?.Quantity?.value}</TableCell>
-
                 <TableCell align="center">
                   {getDateTime(obs)}
                 </TableCell>
