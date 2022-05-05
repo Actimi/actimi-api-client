@@ -11,28 +11,16 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Patient } from "../models/FhirTypes";
-import { useStore } from "../store";
-import { ObservationCode } from "../utils/ObservationCode";
+import React, {useEffect, useMemo, useState} from "react";
+import {Patient} from "../models/FhirTypes";
+import {useStore} from "../store";
+import {ObservationCode} from "../utils/ObservationCode";
 import service from "../utils/service";
 
 const PatientList: React.FC = () => {
   const store = useStore();
 
   const [organization, setOrganization] = useState();
-
-  const getAge = (row: Patient) => {
-    const birthDate = row.birthDate;
-    if (!birthDate) {
-      return "--";
-    }
-    const birthDateObj = new Date(birthDate);
-    const ageDifMs = Date.now() - birthDateObj.getTime();
-    const ageDate = new Date(ageDifMs); // miliseconds from epoch
-    return Math.abs(ageDate.getUTCFullYear() - 1970).toString();
-  };
 
   const getOrganization = () => {
     if (!organization) {
@@ -42,25 +30,26 @@ const PatientList: React.FC = () => {
   };
 
   const getName = (patient: Patient) => {
-    const name = `${patient?.name?.[0]?.given} ${patient?.name?.[0]?.family}`;
-    return name;
+    return `${patient?.name?.[0]?.given} ${patient?.name?.[0]?.family}`;
   };
 
-  useEffect(() => {
-    service.getOrganization().then((org) => {
-      setOrganization(org);
-    });
-  }, []);
-
   const { updatePatients, state } = store;
-  const { data, loading, measurements } = state.patients;
 
+  const { data, loading, measurements } = state.patients;
   const getObservationName = (code?: string) => {
+
     if (!code) {
       return "";
     }
     return ObservationCode[code] ?? "";
   };
+
+  useEffect(() => {
+    service.getOrganization().then((org) => {
+      console.log(org)
+      setOrganization(org);
+    });
+  }, [data]);
 
   const renderItem = useMemo(() => {
     return data.map((patient, i) => {

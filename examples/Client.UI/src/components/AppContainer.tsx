@@ -1,10 +1,14 @@
 import { AppBar, Container, Toolbar, Box  } from "@mui/material"
 import { Outlet } from "react-router-dom"
+import AuthForm from "./AuthForm"
 
 const Header = () => {
   return (
     <AppBar color='transparent' position="static">
         <Toolbar>
+        <Box ml='auto' >
+          <AuthForm />
+          </Box>
       </Toolbar>
     </AppBar>
   )

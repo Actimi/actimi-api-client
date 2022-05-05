@@ -1,5 +1,6 @@
 import { Patient, Observation } from "../models/FhirTypes";
 import { axiosInstance } from "./axiosInstance";
+import {AxiosError} from "axios";
 
 class Api {
   lastObservationDate?: string;
@@ -38,6 +39,16 @@ class Api {
     if (newLastDate) this.lastObservationDate = newLastDate;
     return data ?? [];
   };
+
+  getTokenWithApiKey = async (apiKey: string) => {
+    try {
+      const { data: {accessToken} } = await axiosInstance.post<{accessToken: string}>('Auth/token', { apiKey });
+      return accessToken;
+    } catch (e) {
+      if ((e as AxiosError).code === '500') throw new Error('apikey/invalid');
+      else throw e;
+    }
+  }
 }
 
 export default new Api();

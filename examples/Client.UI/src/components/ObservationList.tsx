@@ -39,7 +39,7 @@ const ObservationList: React.FC = () => {
       <Typography variant='h3'>Observations</Typography>
       <Divider sx={{mb: 2}}/>
       <Stack direction='row' sx={{mb: 2}}>
-        <Button color='primary' variant='contained'  disabled={loading} onClick={() => updateObservations(100, 1)}>Poll</Button>
+        <Button color='primary' variant='contained'  disabled={loading} onClick={() => updateObservations(999, 1)}>Update</Button>
         <Button variant='outlined' sx={{ml: 'auto'}} onClick={() => navigate('/patients')}>Go to Patients</Button>
       </Stack>
 
@@ -63,6 +63,7 @@ const ObservationList: React.FC = () => {
                   {getObservationName(obs.code?.coding?.[0]?.code ?? '')}
                 </TableCell>
                 <TableCell align="center">{obs?.value?.Quantity?.value}</TableCell>
+
                 <TableCell align="center">
                   {getDateTime(obs)}
                 </TableCell>
