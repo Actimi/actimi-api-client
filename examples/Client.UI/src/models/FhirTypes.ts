@@ -12694,7 +12694,7 @@ export interface Observation {
   /** (Measurement) Device */
   device?: AidboxReference<Device | DeviceMetric>;
   /** Clinically relevant time/time-period for observation */
-  effective?: ObservationEffective;
+  effective: ObservationEffective;
   /** Healthcare event during which this observation is made */
   encounter?: AidboxReference<Encounter>;
   /** Additional content defined by implementations */

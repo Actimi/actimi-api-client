@@ -11,11 +11,12 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import React, {useEffect, useMemo, useState} from "react";
-import {Patient} from "../models/FhirTypes";
-import {useStore} from "../store";
-import {ObservationCode} from "../utils/ObservationCode";
+import React, { useEffect, useMemo, useState } from "react";
+import { Patient } from "../models/FhirTypes";
+import { useStore } from "../store";
+import { ObservationCode } from "../utils/ObservationCode";
 import service from "../utils/service";
+import * as _ from "lodash";
 
 const PatientList: React.FC = () => {
   const store = useStore();
@@ -37,7 +38,6 @@ const PatientList: React.FC = () => {
 
   const { data, loading, measurements } = state.patients;
   const getObservationName = (code?: string) => {
-
     if (!code) {
       return "";
     }
@@ -46,61 +46,63 @@ const PatientList: React.FC = () => {
 
   useEffect(() => {
     service.getOrganization().then((org) => {
-      console.log(org)
+      console.log(org);
       setOrganization(org);
     });
   }, [data]);
 
   const renderItem = useMemo(() => {
-    return data.map((patient, i) => {
-      const _m = measurements.filter((x) => x.subject?.id == patient.id);
-      if (!_m) {
+    return _.sortBy(measurements, (x) =>
+      new Date(x?.effective?.dateTime || "").getTime()
+    )
+      .reverse()
+      .map((o, i) => {
+        const _p = data.find((x) => o.subject?.id == x.id);
+        if (!_p) {
+          return (
+            <TableRow
+              key={i}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                --
+              </TableCell>
+              <TableCell component="th" scope="row">
+                --
+              </TableCell>
+              <TableCell align="center">--</TableCell>
+              <TableCell align="center">--</TableCell>
+              <TableCell align="center">--</TableCell>
+            </TableRow>
+          );
+        }
+        const dateISO = o?.effective?.dateTime?.split("T");
         return (
           <TableRow
             key={i}
             sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
           >
             <TableCell component="th" scope="row">
-              {getName(patient)}
-            </TableCell>
-            <TableCell component="th" scope="row">
-              {patient.id}
-            </TableCell>
-            <TableCell align="center">{getOrganization()}</TableCell>
-            <TableCell align="center">--</TableCell>
-            <TableCell align="center">--</TableCell>
-          </TableRow>
-        );
-      }
-      return _m?.map((observation, obsI) => {
-        const dateISO = observation?.effective?.dateTime?.split("T");
-        return (
-          <TableRow
-            key={obsI}
-            sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-          >
-            <TableCell component="th" scope="row">
               {dateISO?.[0]} {dateISO?.[1]?.replace("Z", "")}
             </TableCell>
             <TableCell component="th" scope="row">
-              {getName(patient)}
+              {getName(_p)}
             </TableCell>
             <TableCell component="th" scope="row">
-              {patient.id}
+              {_p.id}
             </TableCell>
             <TableCell align="center">{getOrganization()}</TableCell>
             <TableCell align="center">
-              {getObservationName(observation?.code?.coding?.[0]?.code)}
+              {getObservationName(o?.code?.coding?.[0]?.code)}
             </TableCell>
             <TableCell align="center">
-              {observation?.value?.Quantity?.value ||
-                observation?.interpretation?.[0]?.coding?.[0]?.code ||
+              {o?.value?.Quantity?.value ||
+                o?.interpretation?.[0]?.coding?.[0]?.code ||
                 "--"}
             </TableCell>
           </TableRow>
         );
       });
-    });
   }, [data, measurements]);
 
   return (
