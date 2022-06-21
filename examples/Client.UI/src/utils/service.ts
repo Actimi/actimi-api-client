@@ -1,4 +1,4 @@
-import { Patient, Observation } from "../models/FhirTypes";
+import { Patient, Observation, MedicationRequest, QuestionnaireResponse } from "../models/FhirTypes";
 import { axiosInstance } from "./axiosInstance";
 import {AxiosError} from "axios";
 
@@ -12,11 +12,9 @@ class Api {
     return data;
   };
 
-  getPatients = async (_count: number, _page: number) => {
+  getPatients = async () => {
     const params: any = {};
     if (this.lastPatientDate) params.afterDateTime = this.lastPatientDate;
-    params.count = _count;
-    params.page = _page;
     const { data } = await axiosInstance.get<Patient[]>("/Patient", { params });
 
     const newLastDate = data?.[0]?.meta?.lastUpdated;
@@ -24,15 +22,11 @@ class Api {
     return data ?? [];
   };
 
-  getObservations = async (_count: number, _page: number, subject?: string) => {
-    const params: any = {};
+  getObservations = async (params: {count?: number, page?: number, subject?: string, afterDateTime?: string} = {}) => {
     if (this.lastObservationDate)
-      params.afterDateTime = this.lastObservationDate;
-    params.count = _count;
-    params.page = _page;
-    params.subject = subject;
+    params.afterDateTime = this.lastObservationDate;
     const { data } = await axiosInstance.get<Observation[]>(`/Observation`, {
-      params,
+    params,
     });
 
     const newLastDate = data?.[0]?.meta?.lastUpdated;
@@ -48,6 +42,16 @@ class Api {
       if ((e as AxiosError).code === '500') throw new Error('apikey/invalid');
       else throw e;
     }
+  }
+
+  getMedicationRequests = async (params: {afterDateTime?: string, subject?: string} = {}) => {
+    const {data} = await axiosInstance.get<MedicationRequest[]>('/MedicationRequest', {params});
+    return data;
+  }
+
+  getQuestionnaireResponses = async (params: {afterDateTime?: string, subject?: string, id?: string} = {}) => {
+    const {data} = await axiosInstance.get<QuestionnaireResponse[]>('/QuestionnaireResponse', {params});
+    return data;
   }
 }
 

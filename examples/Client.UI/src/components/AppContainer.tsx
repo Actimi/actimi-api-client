@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <AppBar color='transparent' position="static">
         <Toolbar>
-        <Box ml='auto' >
+        <Box>
           <AuthForm />
           </Box>
       </Toolbar>
